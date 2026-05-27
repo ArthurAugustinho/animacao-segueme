@@ -1,5 +1,7 @@
+import { cache } from "react";
 import { db } from "./index";
-import { teatros, roteiros } from "./schema";
+import { teatros, roteiros, configuracoes } from "./schema";
+import type { Configuracao } from "./schema";
 import { asc, eq, and } from "drizzle-orm";
 
 export async function listarTeatros() {
@@ -72,3 +74,21 @@ export async function buscarTeatroPorId(id: number) {
     .limit(1);
   return teatro ?? null;
 }
+
+export const buscarConfiguracao = cache(async (): Promise<Configuracao> => {
+  const rows = await db.select().from(configuracoes).limit(1);
+  if (rows.length > 0) return rows[0];
+
+  // Primeira execução: cria a linha singleton
+  const [criada] = await db
+    .insert(configuracoes)
+    .values({ id: 1 })
+    .onConflictDoNothing()
+    .returning();
+
+  if (criada) return criada;
+
+  // Corrida com outra requisição simultânea — busca novamente
+  const [existente] = await db.select().from(configuracoes).limit(1);
+  return existente!;
+});

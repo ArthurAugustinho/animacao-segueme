@@ -28,6 +28,12 @@ export default async function AdminLayout({
               <Link href="/admin/roteiros" className="hover:text-segueme-ink">
                 Roteiros
               </Link>
+              <Link
+                href="/admin/configuracoes"
+                className="hover:text-segueme-ink"
+              >
+                Configurações
+              </Link>
               <Link href="/" className="hover:text-segueme-ink">
                 Ver site →
               </Link>
@@ -50,6 +56,7 @@ export default async function AdminLayout({
         <nav className="flex gap-5 border-t border-segueme-line px-4 py-2 text-sm text-segueme-muted sm:hidden">
           <Link href="/admin/teatros">Teatros</Link>
           <Link href="/admin/roteiros">Roteiros</Link>
+          <Link href="/admin/configuracoes">Configurações</Link>
           <Link href="/">Ver site →</Link>
         </nav>
       </header>

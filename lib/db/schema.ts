@@ -7,8 +7,9 @@ import {
   integer,
   primaryKey,
   boolean,
+  check,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import type { AdapterAccountType } from "next-auth/adapters";
 
 // ============================================================
@@ -123,3 +124,23 @@ export type Teatro = typeof teatros.$inferSelect;
 export type NovoTeatro = typeof teatros.$inferInsert;
 export type Roteiro = typeof roteiros.$inferSelect;
 export type NovoRoteiro = typeof roteiros.$inferInsert;
+
+// ============================================================
+// Configurações da aplicação (singleton — sempre id = 1)
+// ============================================================
+
+export const configuracoes = pgTable(
+  "configuracoes",
+  {
+    id: integer("id").primaryKey().default(1),
+    logoDataUri: text("logo_data_uri"),
+    logoMimeType: varchar("logo_mime_type", { length: 50 }),
+    logoTamanhoBytes: integer("logo_tamanho_bytes"),
+    atualizadoEm: timestamp("atualizado_em", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [check("configuracoes_singleton", sql`${t.id} = 1`)]
+);
+
+export type Configuracao = typeof configuracoes.$inferSelect;

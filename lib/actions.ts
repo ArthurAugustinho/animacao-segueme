@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { teatros, roteiros } from "@/lib/db/schema";
+import { teatros, roteiros, configuracoes } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -169,4 +169,92 @@ export async function excluirRoteiro(id: number) {
   await db.delete(roteiros).where(eq(roteiros.id, id));
   revalidatePath("/");
   revalidatePath("/admin/roteiros");
+}
+
+// ============================================================
+// Logo
+// ============================================================
+
+const MIME_ACEITOS = [
+  "image/png",
+  "image/svg+xml",
+  "image/jpeg",
+  "image/webp",
+] as const;
+
+const logoSchema = z
+  .instanceof(File)
+  .refine((f) => f.size > 0, "Selecione um arquivo.")
+  .refine(
+    (f) => f.size <= 500 * 1024,
+    "O arquivo excede o limite de 500 KB."
+  )
+  .refine(
+    (f) => (MIME_ACEITOS as readonly string[]).includes(f.type),
+    "Formato não suportado. Use PNG, SVG, JPG ou WEBP."
+  );
+
+export type AtualizarLogoState = { erro: string } | null;
+
+export async function atualizarLogo(
+  _prevState: AtualizarLogoState,
+  formData: FormData
+): Promise<AtualizarLogoState> {
+  await requireAdmin();
+
+  const arquivo = formData.get("arquivo");
+  const resultado = logoSchema.safeParse(arquivo);
+
+  if (!resultado.success) {
+    return { erro: resultado.error.errors[0].message };
+  }
+
+  const file = resultado.data;
+  const buffer = await file.arrayBuffer();
+  const base64 = Buffer.from(buffer).toString("base64");
+  const dataUri = `data:${file.type};base64,${base64}`;
+
+  await db
+    .insert(configuracoes)
+    .values({
+      id: 1,
+      logoDataUri: dataUri,
+      logoMimeType: file.type,
+      logoTamanhoBytes: file.size,
+      atualizadoEm: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: configuracoes.id,
+      set: {
+        logoDataUri: dataUri,
+        logoMimeType: file.type,
+        logoTamanhoBytes: file.size,
+        atualizadoEm: new Date(),
+      },
+    });
+
+  revalidatePath("/");
+  revalidatePath("/admin/configuracoes");
+  redirect("/admin/configuracoes");
+}
+
+export async function restaurarLogoPadrao() {
+  await requireAdmin();
+
+  await db
+    .insert(configuracoes)
+    .values({ id: 1 })
+    .onConflictDoUpdate({
+      target: configuracoes.id,
+      set: {
+        logoDataUri: null,
+        logoMimeType: null,
+        logoTamanhoBytes: null,
+        atualizadoEm: new Date(),
+      },
+    });
+
+  revalidatePath("/");
+  revalidatePath("/admin/configuracoes");
+  redirect("/admin/configuracoes");
 }
