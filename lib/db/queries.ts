@@ -100,8 +100,8 @@ export const buscarConfiguracao = cache(async (): Promise<Configuracao> => {
     // Corrida com outra requisição simultânea — busca novamente
     const [existente] = await db.select().from(configuracoes).limit(1);
     return existente ?? configPadrao;
-  } catch {
-    // Tabela ainda não criada (db:push pendente)
+  } catch (err) {
+    console.error("[buscarConfiguracao] Erro ao acessar tabela configuracoes:", err);
     return configPadrao;
   }
 });
