@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, DM_Sans } from "next/font/google";
 import "./globals.css";
+import { SplashScreen } from "@/components/splash-screen";
+import { buscarConfiguracao } from "@/lib/db/queries";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -27,14 +29,25 @@ export const viewport: Viewport = {
   themeColor: "#F4C430",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  let logoDataUri: string | null = null;
+  try {
+    const config = await buscarConfiguracao();
+    logoDataUri = config.logoDataUri;
+  } catch {
+    // tabela ainda não criada — splash usa logo padrão
+  }
+
   return (
     <html lang="pt-BR" className={`${fraunces.variable} ${dmSans.variable}`}>
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <SplashScreen logoDataUri={logoDataUri} />
+        {children}
+      </body>
     </html>
   );
 }

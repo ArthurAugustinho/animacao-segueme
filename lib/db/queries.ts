@@ -75,20 +75,33 @@ export async function buscarTeatroPorId(id: number) {
   return teatro ?? null;
 }
 
+const configPadrao: Configuracao = {
+  id: 1,
+  logoDataUri: null,
+  logoMimeType: null,
+  logoTamanhoBytes: null,
+  atualizadoEm: new Date(0),
+};
+
 export const buscarConfiguracao = cache(async (): Promise<Configuracao> => {
-  const rows = await db.select().from(configuracoes).limit(1);
-  if (rows.length > 0) return rows[0];
+  try {
+    const rows = await db.select().from(configuracoes).limit(1);
+    if (rows.length > 0) return rows[0];
 
-  // Primeira execução: cria a linha singleton
-  const [criada] = await db
-    .insert(configuracoes)
-    .values({ id: 1 })
-    .onConflictDoNothing()
-    .returning();
+    // Primeira execução: cria a linha singleton
+    const [criada] = await db
+      .insert(configuracoes)
+      .values({ id: 1 })
+      .onConflictDoNothing()
+      .returning();
 
-  if (criada) return criada;
+    if (criada) return criada;
 
-  // Corrida com outra requisição simultânea — busca novamente
-  const [existente] = await db.select().from(configuracoes).limit(1);
-  return existente!;
+    // Corrida com outra requisição simultânea — busca novamente
+    const [existente] = await db.select().from(configuracoes).limit(1);
+    return existente ?? configPadrao;
+  } catch {
+    // Tabela ainda não criada (db:push pendente)
+    return configPadrao;
+  }
 });

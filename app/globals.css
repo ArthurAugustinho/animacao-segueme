@@ -118,6 +118,44 @@ body {
   pointer-events: none;
 }
 
+/* Modo apresentação */
+.prose-apresentacao {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.5rem;
+  line-height: 1.65;
+  color: var(--segueme-cream);
+}
+
+.prose-apresentacao h1,
+.prose-apresentacao h2,
+.prose-apresentacao h3 {
+  color: var(--segueme-yellow);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.75rem;
+  margin-top: 0;
+}
+
+.prose-apresentacao p {
+  margin-bottom: 1.25rem;
+}
+
+.prose-apresentacao strong {
+  color: var(--segueme-yellow);
+  font-weight: 700;
+}
+
+.prose-apresentacao em {
+  color: rgba(255, 251, 240, 0.7);
+  font-style: italic;
+}
+
+.prose-apresentacao blockquote {
+  border-left: 3px solid var(--segueme-yellow);
+  padding-left: 1rem;
+  opacity: 0.8;
+}
+
 /* Inputs admin */
 .input {
   width: 100%;

@@ -6,6 +6,7 @@ import {
 } from "@/lib/db/queries";
 import { Header } from "@/components/header";
 import { formatarData, formatarDuracao } from "@/lib/utils";
+import { RoteiroReveal } from "@/components/roteiro-reveal";
 
 export const dynamic = "force-dynamic";
 
@@ -72,13 +73,15 @@ export default async function RoteiroPage({
             </div>
           </header>
 
-          {/* Conteúdo HTML produzido pelo TipTap, estilizado por .prose-roteiro */}
-          <div
-            className="prose-roteiro"
-            dangerouslySetInnerHTML={{ __html: conteudoHtml }}
-          />
+          <RoteiroReveal html={conteudoHtml} />
 
-          <div className="mt-12 flex justify-center">
+          <div className="mt-12 flex flex-col items-center gap-5">
+            <Link
+              href={`/${teatroSlug}/${roteiroSlug}/apresentacao`}
+              className="inline-flex items-center gap-2 rounded-lg border border-segueme-line px-4 py-2.5 text-sm font-medium text-segueme-ink transition-colors hover:bg-segueme-ink hover:text-segueme-cream"
+            >
+              ▶ Modo apresentação
+            </Link>
             <div className="font-display text-2xl text-segueme-yellow">✦</div>
           </div>
         </article>
