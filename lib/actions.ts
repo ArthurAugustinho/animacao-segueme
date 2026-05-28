@@ -186,8 +186,8 @@ const logoSchema = z
   .instanceof(File)
   .refine((f) => f.size > 0, "Selecione um arquivo.")
   .refine(
-    (f) => f.size <= 500 * 1024,
-    "O arquivo excede o limite de 500 KB."
+    (f) => f.size <= 1000 * 1024,
+    "O arquivo excede o limite de 1 MB."
   )
   .refine(
     (f) => (MIME_ACEITOS as readonly string[]).includes(f.type),

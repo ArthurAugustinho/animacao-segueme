@@ -38,7 +38,7 @@ export function LogoForm() {
             file:text-segueme-ink hover:file:bg-segueme-cream"
         />
         <p className="mt-1.5 text-xs text-segueme-muted">
-          PNG, SVG, JPG ou WEBP · máx. 500 KB
+          PNG, SVG, JPG ou WEBP · máx. 1 MB
         </p>
       </div>
 
